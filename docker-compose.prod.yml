@@ -1,0 +1,35 @@
+name: unihub-auth-service-prod
+
+version: "3.9"
+
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: unihub-auth-service-prod
+    ports:
+      - "8001:8001"
+    environment:
+      PORT: 8001
+      MONGO_URI: ${MONGO_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      SES_SENDER_EMAIL: ${SES_SENDER_EMAIL}
+    depends_on:
+      - mongo
+    restart: always   # recommended in prod
+
+  mongo:
+    image: mongo:6
+    container_name: unihub-auth-mongo-prod
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo_data_prod:/data/db
+    restart: always
+
+volumes:
+  mongo_data_prod:

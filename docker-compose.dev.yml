@@ -1,0 +1,32 @@
+name: unihub-auth-service
+
+version: "3.9"
+
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: unihub-auth-service
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - PORT=8001
+      - MONGO_URI=mongodb://mongo:27017/authdb
+      - JWT_SECRET=devsecret
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6
+    container_name: unihub-auth-mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
