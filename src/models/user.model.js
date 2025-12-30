@@ -1,66 +1,54 @@
 import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
-const UserSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      default: uuidv4,
+      unique: true,
+    },
+
+    universityId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "University",
+      required: true,
+    },
+
+    userType: {
+      type: String,
+      enum: ["STUDENT", "FACULTY", "ADMIN", "SUPER_ADMIN"],
+      required: true,
+    },
+
+    systemId: {
+      type: String,
+      default: null,
+    },
+
     email: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
-      trim: true,
-      index: true,
     },
+
     passwordHash: {
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["STUDENT", "FACULTY", "ADMIN", "SUPERADMIN"],
-      default: "STUDENT",
-    },
-    systemId: {
-      type: String,
-      default: null,
-      sparse: true,
-      index: true,
-    },
-    otp: {
-      type: String,
-      default: null,
-    },
-    otpExpiresAt: {
-      type: Date,
-      default: null,
-      index: true,
-    },
-    isVerified: {
+
+    isEmailVerified: {
       type: Boolean,
       default: false,
     },
+
     status: {
       type: String,
-      enum: ["PENDING_OTP", "ACTIVE"],
-      default: "PENDING_OTP",
-    },
-    refreshTokenHash: {
-      type: String,
-      default: null,
+      enum: ["ACTIVE", "BLOCKED"],
+      default: "ACTIVE",
     },
   },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
+  { timestamps: true }
 );
 
-UserSchema.methods.toJson = function(){
-    const obj = this.toObject();
-    delete obj.passwordHash;
-    delete obj.otp;
-    delete obj.otpExpiresAt;
-    delete obj.refreshTokenHash;
-    return obj;
-}
-
-export default mongoose.model("User",UserSchema);
+export default mongoose.model("User", userSchema);
