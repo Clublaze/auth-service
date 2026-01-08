@@ -6,10 +6,6 @@ import AppError from "../utils/appError.js";
 import env from "../config/env.js";
 
 class TokenService {
-  /**
-   * 🔐 Generate Access Token (JWT)
-   * Used for API authorization
-   */
   generateAccessToken(user, permissions = []) {
     if (!env.accessTokenSecret) {
       throw new AppError("Access token secret is not configured", 500);
@@ -20,19 +16,16 @@ class TokenService {
         sub: user.id,
         universityId: user.universityId,
         type: user.userType,
-        permissions, // PBAC claims
+        permissions,
       },
-      env.accessTokenSecret, // ✅ FIXED (was env.jwtAccessSecret)
+      env.accessTokenSecret,
       {
-        expiresIn: env.accessTokenExpiresIn, // ✅ FIXED
+        expiresIn: env.accessTokenExpiresIn,
         issuer: env.jwtIssuer || "auth-service",
       }
     );
   }
 
-  /**
-   * 🔁 Generate Refresh Token (DB stored)
-   */
   async generateRefreshToken(userId) {
     const token = crypto.randomBytes(40).toString("hex");
 
@@ -48,10 +41,7 @@ class TokenService {
     return token;
   }
 
-  /**
-   * 🔄 Rotate Refresh Token
-   * (Invalidate old, issue new)
-   */
+
   async rotateRefreshToken(oldToken) {
     const storedToken = await refreshTokenRepository.find(oldToken);
 
@@ -69,9 +59,6 @@ class TokenService {
     return this.generateRefreshToken(storedToken.userId);
   }
 
-  /**
-   * 🚪 Logout from all devices
-   */
   async revokeAllSessions(userId) {
     await refreshTokenRepository.revokeAllForUser(userId);
   }

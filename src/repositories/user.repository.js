@@ -18,11 +18,7 @@ class UserRepository {
   }
 
   async updateStatus(userId, status) {
-    return User.findOneAndUpdate(
-      { id: userId },
-      { status },
-      { new: true }
-    );
+    return User.findOneAndUpdate({ id: userId }, { status }, { new: true });
   }
 
   async markEmailVerified(userId) {

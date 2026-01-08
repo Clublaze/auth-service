@@ -32,11 +32,8 @@ const env = {
   },
 };
 
-/**
- * ❗ Fail fast if critical secrets are missing
- */
 if (!env.accessTokenSecret || !env.refreshTokenSecret) {
-  console.error("❌ JWT secrets are missing in environment variables");
+  console.error("JWT secrets are missing in environment variables");
   process.exit(1);
 }
 

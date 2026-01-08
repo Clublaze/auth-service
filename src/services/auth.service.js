@@ -45,7 +45,7 @@ class AuthService {
       userType: "FACULTY",
       email,
       passwordHash,
-      isEmailVerified: true, // optionally false if approval required
+      isEmailVerified: true, 
     });
 
     return user;
