@@ -14,13 +14,15 @@ services:
       PORT: 8001
       MONGO_URI: ${MONGO_URI}
       JWT_SECRET: ${JWT_SECRET}
+      KAFKA_BROKERS: ${KAFKA_BROKERS}
+      KAFKA_CLIENT_ID: auth-service
       AWS_REGION: ${AWS_REGION}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       SES_SENDER_EMAIL: ${SES_SENDER_EMAIL}
     depends_on:
       - mongo
-    restart: always   # recommended in prod
+    restart: always
 
   mongo:
     image: mongo:6

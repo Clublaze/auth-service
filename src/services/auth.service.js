@@ -4,10 +4,14 @@ import passwordService from "./password.service.js";
 import tokenService from "./token.service.js";
 import AppError from "../utils/appError.js";
 
+import {
+  publishUserRegistered,
+  publishUserLoggedIn,
+} from "../messaging/producers/user.producer.js";
+
 class AuthService {
   async registerStudent({ email, password, systemId }) {
     const university = await universityService.resolveUniversityByEmail(email);
-
     universityService.validateStudent(university, email, systemId);
 
     const existingUser = await userRepository.findByEmail(email);
@@ -25,12 +29,25 @@ class AuthService {
       passwordHash,
     });
 
+    try {
+      await publishUserRegistered({
+        userId: user.id,
+        email: user.email,
+        userType: user.userType,
+        universityId: user.universityId,
+      });
+    } catch (error) {
+      console.error(
+        "Kafka publish failed: user.registered",
+        error.message
+      );
+    }
+
     return user;
   }
 
   async registerFaculty({ email, password }) {
     const university = await universityService.resolveUniversityByEmail(email);
-
     universityService.validateFaculty(university, email);
 
     const existingUser = await userRepository.findByEmail(email);
@@ -45,8 +62,22 @@ class AuthService {
       userType: "FACULTY",
       email,
       passwordHash,
-      isEmailVerified: true, 
+      isEmailVerified: true,
     });
+
+    try {
+      await publishUserRegistered({
+        userId: user.id,
+        email: user.email,
+        userType: user.userType,
+        universityId: user.universityId,
+      });
+    } catch (error) {
+      console.error(
+        "Kafka publish failed: user.registered",
+        error.message
+      );
+    }
 
     return user;
   }
@@ -55,12 +86,12 @@ class AuthService {
     const user = await userRepository.findByEmail(email);
 
     if (!user || user.status !== "ACTIVE") {
-      throw new Error("Invalid credentials");
+      throw new AppError("Invalid credentials", 401);
     }
 
     const valid = await passwordService.compare(password, user.passwordHash);
     if (!valid) {
-      throw new Error("Invalid credentials");
+      throw new AppError("Invalid credentials", 401);
     }
 
     const accessToken = tokenService.generateAccessToken({
@@ -70,6 +101,19 @@ class AuthService {
     });
 
     const refreshToken = await tokenService.generateRefreshToken(user.id);
+
+    try {
+      await publishUserLoggedIn({
+        userId: user.id,
+        userType: user.userType,
+        universityId: user.universityId,
+      });
+    } catch (error) {
+      console.error(
+        "Kafka publish failed: user.logged_in",
+        error.message
+      );
+    }
 
     return { accessToken, refreshToken };
   }
