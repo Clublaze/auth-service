@@ -1,17 +1,18 @@
 import universityRepository from "../repositories/university.repository.js";
+import AppError from "../utils/appError.js";
 
 class UniversityService {
   async resolveUniversityByEmail(email) {
     const domain = email.split("@")[1];
 
     if (!domain) {
-      throw new Error("Invalid email format");
+      throw new AppError("Invalid email format",400);
     }
 
     const university = await universityRepository.findByDomain(domain);
 
     if (!university) {
-      throw new Error("University not supported");
+      throw new AppError("University not supported",400);
     }
 
     return university;
@@ -22,11 +23,11 @@ class UniversityService {
     const systemIdRegex = new RegExp(university.systemIdRegex);
 
     if (!emailRegex.test(email)) {
-      throw new Error("Invalid student email");
+      throw new AppError("Invalid student email",400);
     }
 
     if (!systemIdRegex.test(systemId)) {
-      throw new Error("Invalid system ID");
+      throw new AppError("Invalid system ID",400);
     }
   }
 
@@ -34,7 +35,7 @@ class UniversityService {
     const emailRegex = new RegExp(university.facultyEmailRegex);
 
     if (!emailRegex.test(email)) {
-      throw new Error("Invalid faculty email");
+      throw new AppError("Invalid faculty email",400);
     }
   }
 }

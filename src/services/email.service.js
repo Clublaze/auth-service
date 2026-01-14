@@ -19,7 +19,11 @@ class EmailService {
   }
 
   async verifyToken(token, type) {
-    return emailTokenRepository.findValid(token, type);
+    const emailToken = await emailTokenRepository.findValid(token, type);
+    if (!emailToken) return null;
+
+    await emailTokenRepository.delete(token);
+    return emailToken;
   }
 }
 

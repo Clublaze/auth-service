@@ -3,11 +3,22 @@ const errorHandler = (err, req, res, next) => {
     return next(err);
   }
 
-  const statusCode = err.statusCode || 500;
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal Server Error";
+
+  if (err.code === 11000) {
+    statusCode = 409;
+    message = "Resource already exists";
+  }
+
+  if (err.name === "CastError") {
+    statusCode = 400;
+    message = "Invalid ID format";
+  }
 
   res.status(statusCode).json({
     success: false,
-    message: err.message || "Internal Server Error",
+    message,
     ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
 };

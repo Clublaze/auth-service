@@ -31,10 +31,10 @@ class AuthService {
 
     try {
       await publishUserRegistered({
-        userId: user.id,
+        userId: user._id.toString(),
         email: user.email,
         userType: user.userType,
-        universityId: user.universityId,
+        universityId: user.universityId.toString(),
       });
     } catch (error) {
       console.error(
@@ -67,10 +67,10 @@ class AuthService {
 
     try {
       await publishUserRegistered({
-        userId: user.id,
+        userId: user._id.toString(),
         email: user.email,
         userType: user.userType,
-        universityId: user.universityId,
+        universityId: user.universityId.toString(),
       });
     } catch (error) {
       console.error(
@@ -95,18 +95,18 @@ class AuthService {
     }
 
     const accessToken = tokenService.generateAccessToken({
-      sub: user.id,
-      universityId: user.universityId,
+      sub: user._id.toString(),
+      universityId: user.universityId.toString(),
       type: user.userType,
     });
 
-    const refreshToken = await tokenService.generateRefreshToken(user.id);
+    const refreshToken = await tokenService.generateRefreshToken(user._id.toString());
 
     try {
       await publishUserLoggedIn({
-        userId: user.id,
+        userId: user._id.toString(),
         userType: user.userType,
-        universityId: user.universityId,
+        universityId: user.universityId.toString(),
       });
     } catch (error) {
       console.error(

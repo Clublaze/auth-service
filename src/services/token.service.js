@@ -6,16 +6,16 @@ import AppError from "../utils/appError.js";
 import env from "../config/env.js";
 
 class TokenService {
-  generateAccessToken(user, permissions = []) {
+  generateAccessToken(payload, permissions = []) {
     if (!env.accessTokenSecret) {
       throw new AppError("Access token secret is not configured", 500);
     }
 
     return jwt.sign(
       {
-        sub: user.id,
-        universityId: user.universityId,
-        type: user.userType,
+        sub: payload.sub,
+        universityId: payload.universityId.toString(),
+        type: payload.type,
         permissions,
       },
       env.accessTokenSecret,
@@ -41,7 +41,6 @@ class TokenService {
     return token;
   }
 
-
   async rotateRefreshToken(oldToken) {
     const storedToken = await refreshTokenRepository.find(oldToken);
 
@@ -61,6 +60,18 @@ class TokenService {
 
   async revokeAllSessions(userId) {
     await refreshTokenRepository.revokeAllForUser(userId);
+  }
+
+  async getPayloadFromRefreshToken(token) {
+    const storedToken = await refreshTokenRepository.find(token);
+
+    if (!storedToken) {
+      throw new AppError("Invalid refresh token", 401);
+    }
+
+    return {
+      userId: storedToken.userId,
+    };
   }
 }
 

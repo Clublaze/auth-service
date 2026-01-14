@@ -10,6 +10,7 @@ class EmailTokenRepository {
       token,
       type,
       expiresAt: { $gt: new Date() },
+      revoked: false
     });
   }
 

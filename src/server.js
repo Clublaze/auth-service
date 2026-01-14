@@ -11,7 +11,11 @@ const startServer = async () => {
     await connectDB();
     console.log("MongoDB connected");
 
-    await connectKafkaProducer();
+    try {
+      await connectKafkaProducer();
+    } catch (err) {
+      console.error("Kafka connection failed, continuing without producer");
+    }
 
     const server = app.listen(env.port, () => {
       console.log(`Auth service running on port ${env.port}`);
@@ -20,9 +24,8 @@ const startServer = async () => {
 
     const shutdown = async () => {
       console.log("Shutting down auth service...");
-      server.close(async () => {
-        await disconnectKafkaProducer();
-        process.exit(0);
+      server.close(() => {
+        disconnectKafkaProducer().finally(() => process.exit(0));
       });
     };
 

@@ -10,7 +10,7 @@ class UserRepository {
   }
 
   async findById(id) {
-    return User.findOne({ id });
+    return User.findById(id);
   }
 
   async create(userData) {
@@ -18,12 +18,12 @@ class UserRepository {
   }
 
   async updateStatus(userId, status) {
-    return User.findOneAndUpdate({ id: userId }, { status }, { new: true });
+    return User.findByIdAndUpdate(userId, { status }, { new: true });
   }
 
   async markEmailVerified(userId) {
-    return User.findOneAndUpdate(
-      { id: userId },
+    return User.findByIdAndUpdate(
+      userId,
       { isEmailVerified: true },
       { new: true }
     );
