@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import University from "../src/models/university.model.js";
+import env from "../src/config/env.js";
 
 dotenv.config();
 
 const seed = async () => {
-  await mongoose.connect("mongodb://localhost:27017/authdb");
+  await mongoose.connect(env.mongoUri);
 
   const exists = await University.findOne({ code: "SHARDA" });
   if (exists) {
