@@ -1,8 +1,6 @@
-kafka -
-    to make kafka topics when in production 
-    Dev: auto-create is OK
-
-    Prod: topic created by infra (Terraform / AWS MSK)
+in production use these for mongo and kafka - 
+    MongoDB → Atlas
+    Kafka → Managed (MSK / Confluent)
 
 Redis for refresh tokens (advanced)
 Permission storage model (permission.model.js)
